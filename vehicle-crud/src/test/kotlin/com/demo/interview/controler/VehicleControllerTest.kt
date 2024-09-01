@@ -1,5 +1,5 @@
 import com.demo.interview.controler.VehicleController
-import com.demo.interview.model.Vehicle
+import com.demo.interview.dto.Vehicle
 import com.demo.interview.service.VehicleService
 import jakarta.persistence.EntityNotFoundException
 import org.junit.jupiter.api.Assertions.*

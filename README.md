@@ -21,3 +21,6 @@ docker-compose up -d
 # Done
 - Spring boot rest controller
 - liquibase
+
+# Missing
+- entity field validation

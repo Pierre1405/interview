@@ -1,20 +1,35 @@
 package com.demo.interview.service
 
-import com.demo.interview.model.Option
-import com.demo.interview.model.Vehicle
+import com.demo.interview.dao.VehicleDao
+import com.demo.interview.dto.Option
+import com.demo.interview.dto.Vehicle
 import org.springframework.stereotype.Component
 import java.util.*
+import com.demo.interview.entity.Vehicle as VehicleEntity
+import com.demo.interview.entity.Option as OptionEntity
 
 
 @Component
-class VehicleServiceImpl : VehicleService {
+class VehicleServiceImpl(
+        val vehicleDao: VehicleDao
+) : VehicleService {
+
 
     override fun getById(id: Int): Optional<Vehicle> {
-        return Optional.of(Vehicle(
-                id = 1,
-                name = "twingo",
-                price = 123,
-                option = setOf(Option(id = 1, name = "CD player", price = 456))
-        ))
+        val maybeVehicleEntity: Optional<VehicleEntity> = vehicleDao.findById(id);
+        return maybeVehicleEntity.map { vehicleEntity ->
+            Vehicle(
+                id = vehicleEntity.id,
+                name = vehicleEntity.name,
+                price = vehicleEntity.price,
+                option = vehicleEntity.options.map { optionEntity: OptionEntity ->
+                    Option(
+                            id = optionEntity.id,
+                            name = optionEntity.name,
+                            price = optionEntity.price
+                    )
+                }
+            )
+        }
     }
 }

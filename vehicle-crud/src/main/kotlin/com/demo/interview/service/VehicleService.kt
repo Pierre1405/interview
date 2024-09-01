@@ -1,6 +1,6 @@
 package com.demo.interview.service
 
-import com.demo.interview.model.Vehicle
+import com.demo.interview.dto.Vehicle
 import java.util.*
 
 interface VehicleService {
