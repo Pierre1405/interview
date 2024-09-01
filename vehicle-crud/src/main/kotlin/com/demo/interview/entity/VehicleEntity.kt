@@ -2,8 +2,8 @@ package com.demo.interview.entity
 
 import jakarta.persistence.*
 
-@Entity
-data class Vehicle(
+@Entity(name = "Vehicle")
+data class VehicleEntity(
         @Id
         @GeneratedValue
         @Column(name = "vehicle_id")
@@ -12,5 +12,5 @@ data class Vehicle(
         val price: Int,
         @OneToMany()
         @JoinColumn(name = "vehicle_id")
-        val options: List<Option>
+        val optionEntities: List<OptionEntity>
 )

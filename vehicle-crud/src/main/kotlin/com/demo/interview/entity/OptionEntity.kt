@@ -2,8 +2,8 @@ package com.demo.interview.entity
 
 import jakarta.persistence.*
 
-@Entity
-data class Option(
+@Entity(name = "Option")
+data class OptionEntity(
         @Id
         @GeneratedValue
         @Column(name = "option_id")

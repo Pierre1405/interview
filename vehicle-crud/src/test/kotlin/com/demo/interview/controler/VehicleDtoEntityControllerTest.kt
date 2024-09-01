@@ -1,5 +1,5 @@
 import com.demo.interview.controler.VehicleController
-import com.demo.interview.dto.Vehicle
+import com.demo.interview.dto.VehicleDto
 import com.demo.interview.service.VehicleService
 import jakarta.persistence.EntityNotFoundException
 import org.junit.jupiter.api.Assertions.*
@@ -8,14 +8,14 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito.*
 import java.util.*
 
-class VehicleControllerTest {
+class VehicleDtoEntityControllerTest {
 
     private val vehicleService: VehicleService = mock(VehicleService::class.java)
     private val vehicleController = VehicleController(vehicleService)
 
     @Test
     fun testGetVehicleWithValidId() {
-        val vehicle = Vehicle(1, "Car", 10000, emptySet())
+        val vehicle = VehicleDto(1, "Car", 10000,  emptyList())
         `when`(vehicleService.getById(1)).thenReturn(Optional.of(vehicle))
 
         val result = vehicleController.getVehicle(1)

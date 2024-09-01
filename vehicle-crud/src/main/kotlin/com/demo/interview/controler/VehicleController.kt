@@ -1,6 +1,6 @@
 package com.demo.interview.controler
 
-import com.demo.interview.dto.Vehicle
+import com.demo.interview.dto.VehicleDto
 import com.demo.interview.service.VehicleService
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.web.bind.annotation.GetMapping
@@ -13,12 +13,22 @@ class VehicleController(
 ) {
 
     @GetMapping(path = ["/vehicle/{id}"])
-    fun getVehicle(@PathVariable id: Int): Vehicle {
+    fun getVehicle(@PathVariable id: Int): VehicleDto {
         if (id <= 0) {
             throw IllegalArgumentException("Invalid vehicle ID")
         }
         return vehicleService
                 .getById(id)
+                .orElseThrow { EntityNotFoundException("Vehicle not found") }
+    }
+
+    @GetMapping(path = ["/vehicle/{id}/discount/{discount}"])
+    fun getVehicleDiscount(@PathVariable id: Int, @PathVariable discount: Int): VehicleDto {
+        if (id <= 0) {
+            throw IllegalArgumentException("Invalid vehicle ID")
+        }
+        return vehicleService
+                .getByIdWithDiscount(id, discount)
                 .orElseThrow { EntityNotFoundException("Vehicle not found") }
     }
 }
