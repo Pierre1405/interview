@@ -1,1 +1,5 @@
-rootProject.name = "interview"
+rootProject.name = 'interview'
+
+
+
+include("vehicle-crud")

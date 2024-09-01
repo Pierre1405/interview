@@ -1,4 +1,9 @@
 package com.demo.interview.controler
 
-class VehicleControler {
+import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.GetMapping
+
+@Controller
+class VehicleController {
+
 }
