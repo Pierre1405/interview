@@ -1,9 +1,13 @@
 package com.demo.interview.controler
 
-import org.springframework.stereotype.Controller
+import com.demo.interview.model.Vehicle
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RestController
 
-@Controller
+@RestController()
 class VehicleController {
-
+    @GetMapping(path = ["/vehicle"])
+    fun getVehicle(): Vehicle {
+        return Vehicle(name = "twingo")
+    }
 }
