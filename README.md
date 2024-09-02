@@ -94,11 +94,11 @@ docker-compose up -d
 ### Missing feature
 - More validation
 - Better exception management
-- no getAll, POST, PUT, DELETE api
-- swagger documentation
+- No getAll, POST, PUT, DELETE api
+- Swagger documentation
 
 ### Missing demonstration
-I didn't have the time to do so much, but, I would have like to do more. Like create
+I didn't have the time to do so much, but, I would have liked to do more. Like create
 another microservice to stream aggregated data on a no sql db
 - docker
 - streaming, postgres -> kafka -> aggregation -> kafka -> mongodb with kafka connect and kafka stream ???
