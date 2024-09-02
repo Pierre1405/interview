@@ -43,6 +43,9 @@ cd docker
 docker-compose up -d
 ````
 - Launch `vehicle-crud/src/main/kotlin/com/demo/interview/VehiculeCrudApplication.kt` application
+- Launch `docker/kafka-connect/init-connectors.sh` application
+
+
 
 ### Test the application
 
@@ -88,6 +91,9 @@ docker-compose up -d
 ```
 - you can also test with the car with id 2
 - You can also try the `VehicleDtoEntityControllerTest` and `VehicleServiceImplTest` tests
+- Check the 2 following urls to see the creation of options and vehicle on kafka
+  `http://localhost:8081/ui/clusters/local/all-topics/postgres-01-option/messages?keySerde=String&valueSerde=SchemaRegistry&limit=100`
+  `http://localhost:8081/ui/clusters/local/all-topics/postgres-01-vehicle/messages?keySerde=String&valueSerde=SchemaRegistry&limit=100`
 
 # Work in progress
 
@@ -96,6 +102,7 @@ docker-compose up -d
 - Better exception management
 - No getAll, POST, PUT, DELETE api
 - Swagger documentation
+- no avro serialization on kafka
 
 ### Missing demonstration
 I didn't have the time to do so much, but, I would have liked to do more. Like create
