@@ -1,9 +1,9 @@
 # Purpose of this application
 
-After 8 months without coding (except training), it was very very hard for me to remember
-the syntax of even the most basic SQL query, I really had the feeling that I miss 
-the technical test, so I decide to create that application in order to demonstrate 
-what I can do with the help of Google to assist my deficient memory.
+After 8 months without coding (except training), it was very hard for me to remember
+the syntax, I really had the feeling that I could have done better for 
+the technical test, so I decide to create this application in order to demonstrate 
+what I can do in normal working condition.
 
 ### Demonstrated skills
 
