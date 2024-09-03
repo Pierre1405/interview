@@ -16,7 +16,9 @@ curl --location 'http://localhost:8083/connectors' \
     "transforms.createKey.type":"org.apache.kafka.connect.transforms.ValueToKey",
     "transforms.createKey.fields":"option_id",
     "transforms.extractInt.type":"org.apache.kafka.connect.transforms.ExtractField$Key",
-    "transforms.extractInt.field":"option_id"
+    "transforms.extractInt.field":"option_id",
+    "value.converter":"org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable":"false"
   }
 }
 '
@@ -39,7 +41,9 @@ curl --location 'http://localhost:8083/connectors' \
     "transforms.createKey.type":"org.apache.kafka.connect.transforms.ValueToKey",
     "transforms.createKey.fields":"vehicle_id",
     "transforms.extractInt.type":"org.apache.kafka.connect.transforms.ExtractField$Key",
-    "transforms.extractInt.field":"vehicle_id"
+    "transforms.extractInt.field":"vehicle_id",
+    "value.converter":"org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable":"false"
   }
 }
 '
