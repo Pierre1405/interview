@@ -38,7 +38,7 @@ class VehicleServiceImplTest {
         assertEquals(1, result.get().id)
         assertEquals("Car", result.get().name)
         assertEquals(10000, result.get().price)
-        assertEquals(1800, result.get().optionDto[0].price) // 10% discount on 2000
+        assertEquals(1800, result.get().options[0].price) // 10% discount on 2000
     }
 
 
@@ -56,8 +56,8 @@ class VehicleServiceImplTest {
         assertEquals(1, result.get().id)
         assertEquals("Car", result.get().name)
         assertEquals(10000, result.get().price)
-        assertEquals(2000, result.get().optionDto[0].price) // same price
-        assertEquals(3600, result.get().optionDto[1].price) // 10% discount on 4000
+        assertEquals(2000, result.get().options[0].price) // same price
+        assertEquals(3600, result.get().options[1].price) // 10% discount on 4000
     }
 
 
@@ -73,7 +73,7 @@ class VehicleServiceImplTest {
         assertEquals(1, result.get().id)
         assertEquals("Car", result.get().name)
         assertEquals(10000, result.get().price)
-        assertEquals(8, result.get().optionDto[0].price) // 11% 9% discount should be 8.9 round to 8
+        assertEquals(8, result.get().options[0].price) // 11% 9% discount should be 8.9 round to 8
     }
 
 
@@ -89,7 +89,7 @@ class VehicleServiceImplTest {
         assertEquals(1, result.get().id)
         assertEquals("Car", result.get().name)
         assertEquals(10000, result.get().price)
-        assertEquals(9, result.get().optionDto[0].price) // 9% discount should be 9.1 round to 9
+        assertEquals(9, result.get().options[0].price) // 9% discount should be 9.1 round to 9
     }
 
 
@@ -104,6 +104,6 @@ class VehicleServiceImplTest {
         assertEquals(1, result.get().id)
         assertEquals("Car", result.get().name)
         assertEquals(10000, result.get().price)
-        assertTrue(result.get().optionDto.isEmpty())
+        assertTrue(result.get().options.isEmpty())
     }
 }

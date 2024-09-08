@@ -22,33 +22,51 @@ class VehicleServiceImpl(
                 applyDiscountToMostExpensiveOption(vehicle, discount)
             }
 
+    override fun save(vehicle: VehicleDto) {
+        vehicleDao.save(mapDtoToEntity(vehicle))
+    }
+
+
     private fun mapEntityToDto(vehicleEntity: VehicleEntity): VehicleDto =
-            VehicleDto(
-                    id = vehicleEntity.id,
-                    name = vehicleEntity.name,
-                    price = vehicleEntity.price,
-                    optionDto = vehicleEntity.optionEntities.map { optionEntity: OptionEntity ->
-                        OptionDto(
-                                id = optionEntity.id,
-                                name = optionEntity.name,
-                                price = optionEntity.price
-                        )
-                    }
-            )
+        VehicleDto(
+            id = vehicleEntity.id,
+            name = vehicleEntity.name,
+            price = vehicleEntity.price,
+            options = vehicleEntity.options.map { optionEntity: OptionEntity ->
+                OptionDto(
+                    id = optionEntity.id,
+                    name = optionEntity.name,
+                    price = optionEntity.price
+                )
+            }
+        )
+    private fun mapDtoToEntity(vehicle: VehicleDto): VehicleEntity =
+        VehicleEntity(
+            id = vehicle.id,
+            name = vehicle.name,
+            price = vehicle.price,
+            options = vehicle.options.map { optionDto: OptionDto ->
+                OptionEntity(
+                    id = optionDto.id,
+                    name = optionDto.name,
+                    price = optionDto.price
+                )
+            }
+        )
 
     private fun applyDiscountToMostExpensiveOption(vehicle: VehicleDto, discount: Int): VehicleDto =
-            if (vehicle.optionDto.isEmpty()) {
+            if (vehicle.options.isEmpty()) {
                 vehicle
             } else {
-                val mostExpensiveOptionDto: OptionDto = vehicle.optionDto.maxBy { option -> option.price }
+                val mostExpensiveOptionDto: OptionDto = vehicle.options.maxBy { option -> option.price }
                 val priceWithDiscount: Int = kotlin.math.floor(mostExpensiveOptionDto.price.toDouble() * (100 - discount) / 100).toInt()
-                val mostExpensiveOptionIndex = vehicle.optionDto.indexOf(mostExpensiveOptionDto)
-                val optionWithDiscount = vehicle.optionDto.toMutableList()
-                optionWithDiscount[mostExpensiveOptionIndex] = vehicle.optionDto[mostExpensiveOptionIndex].copy(
+                val mostExpensiveOptionIndex = vehicle.options.indexOf(mostExpensiveOptionDto)
+                val optionWithDiscount = vehicle.options.toMutableList()
+                optionWithDiscount[mostExpensiveOptionIndex] = vehicle.options[mostExpensiveOptionIndex].copy(
                         price = priceWithDiscount
                 )
                 vehicle.copy(
-                        optionDto = optionWithDiscount.toList()
+                        options = optionWithDiscount.toList()
                 )
             }
 

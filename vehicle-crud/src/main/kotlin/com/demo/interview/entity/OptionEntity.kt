@@ -5,9 +5,9 @@ import jakarta.persistence.*
 @Entity(name = "Option")
 data class OptionEntity(
         @Id
-        @GeneratedValue
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(name = "option_id")
-        val id: Int,
+        val id: Int?,
         val name: String,
         val price: Int
 )

@@ -6,7 +6,7 @@
 
     <changeSet id="1" author="pierre">
         <createTable tableName="vehicle">
-            <column name="vehicle_id" type="int">
+            <column name="vehicle_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
             <column name="name" type="varchar(256)"/>
@@ -15,19 +15,21 @@
     </changeSet>
     <changeSet id="2" author="pierre">
         <insert tableName="vehicle">
-            <column name="vehicle_id" value="1" />
             <column name="name" value="Twingo" />
             <column name="price" value="123" />
         </insert>
         <insert tableName="vehicle">
-            <column name="vehicle_id" value="2" />
             <column name="name" value="Clio" />
             <column name="price" value="456" />
+        </insert>
+        <insert tableName="vehicle">
+            <column name="name" value="No option" />
+            <column name="price" value="789" />
         </insert>
     </changeSet>
     <changeSet id="3" author="pierre">
         <createTable tableName="option">
-            <column name="option_id" type="int">
+            <column name="option_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
             <column name="vehicle_id" type="int">
@@ -39,19 +41,16 @@
     </changeSet>
     <changeSet id="4" author="pierre">
         <insert tableName="option">
-            <column name="option_id" value="1" />
             <column name="vehicle_id" value="1" />
             <column name="name" value="pink painting" />
             <column name="price" value="34" />
         </insert>
         <insert tableName="option">
-            <column name="option_id" value="2" />
             <column name="vehicle_id" value="1" />
             <column name="name" value="cd player" />
             <column name="price" value="12" />
         </insert>
         <insert tableName="option">
-            <column name="option_id" value="3" />
             <column name="vehicle_id" value="2" />
             <column name="name" value="pink painting" />
             <column name="price" value="34" />

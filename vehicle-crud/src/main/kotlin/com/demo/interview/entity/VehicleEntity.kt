@@ -5,12 +5,12 @@ import jakarta.persistence.*
 @Entity(name = "Vehicle")
 data class VehicleEntity(
         @Id
-        @GeneratedValue
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(name = "vehicle_id")
-        val id: Int,
+        val id: Int?,
         val name: String,
         val price: Int,
         @OneToMany()
         @JoinColumn(name = "vehicle_id")
-        val optionEntities: List<OptionEntity>
+        val options: List<OptionEntity>
 )

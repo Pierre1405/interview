@@ -2,17 +2,16 @@ package com.demo.interview.vehicle_kafka_stream_aggregation.processor
 
 import com.demo.interview.vehicle_kafka_stream_aggregation.jackson.Option
 import com.demo.interview.vehicle_kafka_stream_aggregation.jackson.Vehicle
-import com.demo.interview.vehicle_kafka_stream_aggregation.serde.JacksonSerde
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import org.apache.kafka.common.serialization.Deserializer
-import org.apache.kafka.common.serialization.Serde
-import org.apache.kafka.common.serialization.Serdes
-import org.apache.kafka.common.serialization.Serdes.WrapperSerde
-import org.apache.kafka.common.serialization.Serializer
+import com.demo.interview.vehicle_kafka_stream_aggregation.jackson.VehicleWithOptions
+import com.demo.interview.vehicle_kafka_stream_aggregation.serde.AppSerde.OPTION_SERDE
+import com.demo.interview.vehicle_kafka_stream_aggregation.serde.AppSerde.STRING_SERDE
+import com.demo.interview.vehicle_kafka_stream_aggregation.serde.AppSerde.VEHICLE_SERDE
+import com.demo.interview.vehicle_kafka_stream_aggregation.serde.AppSerde.VEHICLE_WITH_OPTIONS_SERDE
+import org.apache.kafka.common.utils.Bytes
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.kstream.*
+import org.apache.kafka.streams.state.KeyValueStore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.time.Duration
@@ -21,44 +20,52 @@ import java.time.Duration
 @Component
 class VehicleOptionCountProcessor {
 
-    private val objectMapper: ObjectMapper = jacksonObjectMapper()
-    private val INTEGER_SERDE: Serde<Int> = Serdes.Integer()
-
-    private val VEHICLE_SERDE: Serde<Vehicle> = JacksonSerde(Vehicle::class.java)
-    private val OPTION_SERDE: Serde<Option> = JacksonSerde(Option::class.java)
-
-    private val OPTION_VEHICLE_SERDE: Serde<Pair<Vehicle?, Option?>> = object : WrapperSerde<Pair<Vehicle?, Option?>>(
-            Serializer { _, data -> objectMapper.writeValueAsBytes(data) },
-            Deserializer { _, data -> objectMapper.readValue(String(data), objectMapper.typeFactory.constructParametricType(Pair::class.java, Vehicle::class.java, Option::class.java)) }
-    ) {}
-
 
     @Autowired
     fun buildPipeline(streamsBuilder: StreamsBuilder) {
-        val vehicleStream: KStream<Int, Vehicle> = streamsBuilder
-                .stream(INPUT_VEHICLE_TOPIC, Consumed.with(INTEGER_SERDE, VEHICLE_SERDE))
-                .map { key, value -> KeyValue(value.vehicle_id, value) }
-        val optionStream: KStream<Int, Option> = streamsBuilder
-                .stream(INPUT_OPTION_TOPIC, Consumed.with(INTEGER_SERDE, OPTION_SERDE))
-                .map { key, value -> KeyValue(value.vehicle_id, value) }
+        val vehicleStream = streamsBuilder
+            .stream(INPUT_VEHICLE_TOPIC, Consumed.with(STRING_SERDE, VEHICLE_SERDE))
+            .map { key, value -> KeyValue(value.vehicle_id, value) }
+        val optionStream = streamsBuilder
+            .stream(INPUT_OPTION_TOPIC, Consumed.with(STRING_SERDE, OPTION_SERDE))
+            .map { key, value -> KeyValue(value.vehicle_id, value) }
 
-        /*
-        vehicleStream
-                .to(OUTPUT_TOPIC, Produced.with(INTEGER_SERDE, VEHICLE_SERDE))
-        optionStream
-                .to(OUTPUT_TOPIC, Produced.with(INTEGER_SERDE, OPTION_SERDE))
-        */
-        vehicleStream.outerJoin(
+        val vehicleOptionStream = vehicleStream
+            .leftJoin(
                 optionStream,
-                { vehicle, option -> Pair(vehicle, option) },
+                { vehicle: Vehicle?, option: Option? -> Pair(vehicle, option) },
                 JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(1)),
-                StreamJoined.with(INTEGER_SERDE, VEHICLE_SERDE, OPTION_SERDE)
-        )
-                .to(OUTPUT_TOPIC, Produced.with(INTEGER_SERDE, OPTION_VEHICLE_SERDE))
+                StreamJoined.with(STRING_SERDE, VEHICLE_SERDE, OPTION_SERDE)
+            )
+
+
+        val groupByStream: KGroupedStream<String, Pair<Vehicle?, Option?>> = vehicleOptionStream
+            .groupByKey(Grouped.`as`(""))
+
+        val aggregateStream: KStream<String, VehicleWithOptions> = groupByStream
+            .aggregate(
+                { VehicleWithOptions() },
+                { key, vehicleOptionPair, acc ->
+                    val (vehicle, option) = vehicleOptionPair
+                    acc.copy(
+                        vehicle_id = vehicle?.vehicle_id,
+                        name = vehicle?.name,
+                        price = vehicle?.price,
+                        option = if (option != null) acc.option.plus(option) else acc.option
+                    )
+                },
+                Materialized
+                    .`as`<String?, VehicleWithOptions?, KeyValueStore<Bytes, ByteArray>?>("vehicle_with_option_aggregation_state_store")
+                    .withKeySerde(STRING_SERDE)
+                    .withValueSerde(VEHICLE_WITH_OPTIONS_SERDE)
+            )
+
+            .toStream(Named.`as`("vehicle_with_option_aggregation_stream"))
+
     }
 
     companion object {
-        const val OUTPUT_TOPIC = "vehicle_aggregate"
+        const val OUTPUT_TOPIC = "vehicle_aggregate2"
         const val INPUT_VEHICLE_TOPIC = "postgres-01-vehicle"
         const val INPUT_OPTION_TOPIC = "postgres-01-option"
     }

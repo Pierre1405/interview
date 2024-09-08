@@ -15,6 +15,8 @@ The current version of the application should demonstrate the following technica
 - get discount on max price algorithm
 - unit test
 - basic service, dao, controller, etc... architecture
+- docker
+- streaming, postgres -> kafka -> aggregation -> kafka with kafka connect and kafka stream
 
 # Scenario
 - It's a simple read only catalog application. It displays cars with a list of options
@@ -43,7 +45,8 @@ cd docker
 docker-compose up -d
 ````
 - Launch `vehicle-crud/src/main/kotlin/com/demo/interview/VehiculeCrudApplication.kt` application
-- Launch `docker/kafka-connect/init-connectors.sh` application
+- Wait for a few minutes and launch `docker/kafka-connect/init-connectors.sh` application. You should get a 200 status if kafka connect had enough time to start.
+- Launch `vehicle-kafka-stream-aggregation/src/main/kotlin/com/demo/interview/vehicle_kafka_stream_aggregation/VehicleKafkaStreamAggregationApplication.kt` application
 
 
 
@@ -91,9 +94,12 @@ docker-compose up -d
 ```
 - you can also test with the car with id 2
 - You can also try the `VehicleDtoEntityControllerTest` and `VehicleServiceImplTest` tests
-- Check the 2 following urls to see the creation of options and vehicle on kafka
+- Check the 2 following urls to check if kafka connect is streaming options and vehicle from postgres to kafka
   `http://localhost:8081/ui/clusters/local/all-topics/postgres-01-option/messages?keySerde=String&valueSerde=SchemaRegistry&limit=100`
   `http://localhost:8081/ui/clusters/local/all-topics/postgres-01-vehicle/messages?keySerde=String&valueSerde=SchemaRegistry&limit=100`
+- Check the following url to check if kafka stream did the joint between options and vehicle from kafka to kafka
+  `http://localhost:8081/ui/clusters/local/all-topics/vehicle-kafka-stream-aggregation-vehicle_with_option_aggregation_state_store-changelog/messages?keySerde=String&valueSerde=SchemaRegistry&limit=100`
+
 
 # Work in progress
 
@@ -107,8 +113,7 @@ docker-compose up -d
 ### Missing demonstration
 I didn't have the time to do so much, but, I would have liked to do more. Like create
 another microservice to stream aggregated data on a no sql db
-- docker
-- streaming, postgres -> kafka -> aggregation -> kafka -> mongodb with kafka connect and kafka stream ???
+- kafka -> mongodb with kafka connect ???
 - basic sql jdbc queries
 - nosql aggregation
 

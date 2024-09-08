@@ -3,9 +3,7 @@ package com.demo.interview.controler
 import com.demo.interview.dto.VehicleDto
 import com.demo.interview.service.VehicleService
 import jakarta.persistence.EntityNotFoundException
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController()
 class VehicleController(
@@ -30,5 +28,11 @@ class VehicleController(
         return vehicleService
                 .getByIdWithDiscount(id, discount)
                 .orElseThrow { EntityNotFoundException("Vehicle not found") }
+    }
+
+
+    @PostMapping(path = ["/vehicle/"])
+    fun saveVehicle(@RequestBody vehicle: VehicleDto) {
+        vehicleService.save(vehicle)
     }
 }

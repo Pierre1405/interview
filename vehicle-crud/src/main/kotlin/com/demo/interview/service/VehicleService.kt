@@ -6,4 +6,5 @@ import java.util.*
 interface VehicleService {
     fun getById(id: Int): Optional<VehicleDto>
     fun getByIdWithDiscount(id: Int, discount: Int): Optional<VehicleDto>
+    fun save(vehicle: VehicleDto)
 }
