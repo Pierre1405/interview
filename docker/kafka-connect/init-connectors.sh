@@ -14,9 +14,9 @@ curl --location 'http://localhost:8083/connectors' \
     "mode":"bulk",
     "transforms":"createKey,extractInt",
     "transforms.createKey.type":"org.apache.kafka.connect.transforms.ValueToKey",
-    "transforms.createKey.fields":"option_id",
+    "transforms.createKey.fields":"vehicle_id",
     "transforms.extractInt.type":"org.apache.kafka.connect.transforms.ExtractField$Key",
-    "transforms.extractInt.field":"option_id",
+    "transforms.extractInt.field":"vehicle_id",
     "value.converter":"org.apache.kafka.connect.json.JsonConverter",
     "value.converter.schemas.enable":"false"
   }
@@ -46,4 +46,22 @@ curl --location 'http://localhost:8083/connectors' \
     "value.converter.schemas.enable":"false"
   }
 }
+'
+
+curl --location 'http://localhost:8083/connectors' \
+--header 'Accept-Language: fr' \
+--header 'Content-Type: application/json' \
+--data '{
+          "name": "sink_mongodb_vehicle3",
+          "config": {
+            "topics": "aggregate-vehicle",
+            "connector.class": "com.mongodb.kafka.connect.MongoSinkConnector",
+            "connection.uri": "mongodb://mongodb:27017",
+            "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+            "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+            "value.converter.schemas.enable": false,
+            "database": "interview",
+            "collection": "vehicle"
+          }
+        }
 '

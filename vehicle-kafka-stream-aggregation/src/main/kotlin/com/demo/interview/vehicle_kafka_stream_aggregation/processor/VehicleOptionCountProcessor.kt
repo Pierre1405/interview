@@ -25,29 +25,27 @@ class VehicleOptionCountProcessor {
     fun buildPipeline(streamsBuilder: StreamsBuilder) {
         val vehicleStream = streamsBuilder
             .stream(INPUT_VEHICLE_TOPIC, Consumed.with(STRING_SERDE, VEHICLE_SERDE))
-            .map { key, value -> KeyValue(value.vehicle_id, value) }
         val optionStream = streamsBuilder
             .stream(INPUT_OPTION_TOPIC, Consumed.with(STRING_SERDE, OPTION_SERDE))
-            .map { key, value -> KeyValue(value.vehicle_id, value) }
 
         val vehicleOptionStream = vehicleStream
             .leftJoin(
                 optionStream,
                 { vehicle: Vehicle?, option: Option? -> Pair(vehicle, option) },
                 JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(1)),
-                StreamJoined.with(STRING_SERDE, VEHICLE_SERDE, OPTION_SERDE)
+                StreamJoined.with(STRING_SERDE, VEHICLE_SERDE, OPTION_SERDE).withStoreName("vehicle_join_with_option")
             )
 
-
         val groupByStream: KGroupedStream<String, Pair<Vehicle?, Option?>> = vehicleOptionStream
-            .groupByKey(Grouped.`as`(""))
+            .groupByKey(Grouped.`as`("vehicle_option_group_by_key"))
 
-        val aggregateStream: KStream<String, VehicleWithOptions> = groupByStream
+        groupByStream
             .aggregate(
                 { VehicleWithOptions() },
                 { key, vehicleOptionPair, acc ->
                     val (vehicle, option) = vehicleOptionPair
                     acc.copy(
+                        _id = vehicle?.vehicle_id,
                         vehicle_id = vehicle?.vehicle_id,
                         name = vehicle?.name,
                         price = vehicle?.price,
@@ -55,18 +53,18 @@ class VehicleOptionCountProcessor {
                     )
                 },
                 Materialized
-                    .`as`<String?, VehicleWithOptions?, KeyValueStore<Bytes, ByteArray>?>("vehicle_with_option_aggregation_state_store")
+                    .`as`<String?, VehicleWithOptions?, KeyValueStore<Bytes, ByteArray>?>("vehicle_with_option_aggregation")
                     .withKeySerde(STRING_SERDE)
                     .withValueSerde(VEHICLE_WITH_OPTIONS_SERDE)
             )
-
-            .toStream(Named.`as`("vehicle_with_option_aggregation_stream"))
+            .toStream()
+            .to(OUTPUT_TOPIC)
 
     }
 
     companion object {
-        const val OUTPUT_TOPIC = "vehicle_aggregate2"
         const val INPUT_VEHICLE_TOPIC = "postgres-01-vehicle"
         const val INPUT_OPTION_TOPIC = "postgres-01-option"
+        const val OUTPUT_TOPIC = "aggregate-vehicle"
     }
 }

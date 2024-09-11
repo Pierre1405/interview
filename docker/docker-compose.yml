@@ -87,6 +87,7 @@ services:
       - kafka
       - schemaregistry
       - postgres
+      - mongodb
     environment:
       CONNECT_BOOTSTRAP_SERVERS: kafka:29092
       CONNECT_GROUP_ID: compose-connect-group
@@ -107,6 +108,7 @@ services:
 
     volumes:
       - ./kafka-connect/jars/confluentinc-kafka-connect-jdbc-10.7.11/lib:/usr/share/confluent-hub-components/confluentinc-kafka-connect-jdbc/lib
+      - ./kafka-connect/jars/mongodb-kafka-connect-mongodb-1.13.0/lib:/usr/share/confluent-hub-components/mongodb-kafka-connect-mongodb/lib
   mongodb:
     image: mongo:6-jammy
     ports:
